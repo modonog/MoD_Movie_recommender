@@ -11,7 +11,7 @@ import pandas as pd
 import pickle
 
 # Load data
-df = pd.read_csv("final_Movie_dataset_GIT.csv.gz", compression="gzip")
+df = pd.read_csv("final_Movie_dataset_GIT.csv.zip", compression="gzip")
 
 with open("top_similar_movies.pkl", "rb") as f:
     top_similar = pickle.load(f)
