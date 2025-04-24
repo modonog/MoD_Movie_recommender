@@ -1,11 +1,9 @@
 # -*- coding: utf-8 -*-
 """
 Created on Tue Apr 22 19:43:49 2025
-
 @author: mpodo
 """
 
-#streamlit_app.py
 import streamlit as st
 import pandas as pd
 import pickle
@@ -25,20 +23,23 @@ if st.button("Recommend"):
     if movie_input:
         movie_input_lower = movie_input.lower()
 
-        matched_titles = [title for title in top_similar if movie_input_lower in title.lower()]
+        # Match user input to titles in DataFrame
+        matched_titles = [title for title in df['title'] if movie_input_lower in str(title).lower()]
 
         if matched_titles:
-            selected_title = matched_titles[0]  # Just pick the first match
-            recommendations = top_similar[selected_title]
-
+            selected_title = matched_titles[0]
             st.subheader(f"Recommendations for: **{selected_title}**")
 
-            for movie in recommendations:
-                # You may need to adapt this if you stored only indices or just titles
-                movie_row = df[df['title'] == movie]
-                if not movie_row.empty:
-                    movie_data = movie_row.iloc[0]
-                    st.markdown(f"**{movie_data['title']}**")
+            # Get movie ID (row index)
+            movie_id = df[df['title'] == selected_title].index[0]
+
+            # Fetch similar movies using the movie ID
+            similar_movies = top_similar.get(movie_id, [])
+
+            for sim_id, score in similar_movies:
+                if sim_id in df.index:
+                    movie_data = df.loc[sim_id]
+                    st.markdown(f"**{movie_data['title']}** (Similarity: {score:.2f})")
                     st.image(movie_data['poster_url'], width=150)
                     st.markdown(f"[IMDb Link]({movie_data['imdb_link']})")
         else:
