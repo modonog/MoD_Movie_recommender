@@ -70,7 +70,7 @@ if movie_input:
                 else:
                     cols[0].write("[Image not available]")
 
-                cols[1].markdown(f"**{movie['title']} ({int(movie['release_year']) if pd.notna(movie['release_year']) else 'N/A'})**")
+                cols[1].markdown(f"**{movie['title']}**")
                 cols[1].markdown(f"⭐ Rating: {movie.get('vote_average', 'N/A')}")
                 overview = movie.get('overview', 'Overview not available.')
                 cols[1].markdown(f"📝 {overview}")
