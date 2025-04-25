@@ -57,7 +57,7 @@ if st.button("Recommend"):
                     else:
                         st.text("[Image not available]")
 
-                    st.markdown(f"### {title} ({year})")
+                    st.markdown(f"### {title}")
                     st.markdown(f"**Rating:** {rating}")
                     st.markdown(f"**Overview:** {overview}")
                     if pd.notna(imdb_id):
