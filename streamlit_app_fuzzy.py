@@ -36,7 +36,7 @@ if movie_input:
         close_matches = get_close_matches(movie_input, title_list, n=5, cutoff=0.6)
         match_options = movies[movies['normalized_title'].isin(close_matches)]
         if not match_options.empty:
-            display_titles = match_options['title'] + ' (' + match_options['release_year'].fillna('N/A').astype(str) + ')'
+            display_titles = match_options['title']
             selected_title = st.selectbox("Did you mean one of these?", display_titles.tolist())
             selected_movie_idx = match_options[match_options['title'] == selected_title.split(' (')[0]].index[0]
     else:
