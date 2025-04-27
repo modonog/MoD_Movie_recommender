@@ -50,8 +50,20 @@ with input_col1:
 recommend_clicked = st.button("Recommend")
 clear_clicked = st.button("Clear Selection")
 
+# Initialization
+if "clear" not in st.session_state:
+    st.session_state.clear = False
+
+# Clear button
 if clear_clicked:
+    st.session_state.clear = True
     st.experimental_rerun()
+
+# Reset after rerun
+if st.session_state.clear:
+    st.session_state.movie_input = ""
+    st.session_state.clear = False
+
 
 if recommend_clicked and movie_input:
     movie_input = movie_input.strip().lower()
