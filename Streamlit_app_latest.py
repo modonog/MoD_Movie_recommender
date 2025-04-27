@@ -7,7 +7,7 @@ from io import BytesIO
 from difflib import get_close_matches
 
 # Load movie dataset and similarity data
-movies = pd.read_csv("final_Movie_dataset.csv.gz", compression="gzip")
+movies = pd.read_csv("final_Movie_dataset_GIT.csv.gz", compression="gzip")
 with open("top_similar_movies.pkl", "rb") as f:
     top_similar_movies = pickle.load(f)
 
