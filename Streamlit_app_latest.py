@@ -41,6 +41,10 @@ def fetch_poster(poster_path):
 st.set_page_config(page_title="Movie Recommender", layout="wide")
 st.title("🎬 MoD's CS8740 Movie Recommender")
 
+# Initialize session state for clearing input
+if "clear" not in st.session_state:
+    st.session_state.clear = False
+
 # Add input area with columns
 input_col1 = st.container()
 
@@ -50,20 +54,13 @@ with input_col1:
 recommend_clicked = st.button("Recommend")
 clear_clicked = st.button("Clear Selection")
 
-# Initialization
-if "clear" not in st.session_state:
-    st.session_state.clear = False
-
-# Clear button
 if clear_clicked:
     st.session_state.clear = True
     st.experimental_rerun()
 
-# Reset after rerun
 if st.session_state.clear:
     st.session_state.movie_input = ""
     st.session_state.clear = False
-
 
 if recommend_clicked and movie_input:
     movie_input = movie_input.strip().lower()
@@ -112,7 +109,7 @@ if recommend_clicked and movie_input:
                 rec_cols[0].write("[Image not available]")
 
             # Movie info
-            rec_cols[1].markdown(f"**{movie['title']} ")
+            rec_cols[1].markdown(f"**{movie['title']}")
             rec_cols[1].markdown(f"⭐ Rating: {movie.get('vote_average', 'N/A')}")
             overview = movie.get('overview', 'Overview not available.')
             rec_cols[1].markdown(f"📝 {overview}")
