@@ -42,20 +42,18 @@ st.set_page_config(page_title="Movie Recommender", layout="wide")
 st.title("🎬 MoD's CS8740 Movie Recommender")
 
 # Add input area with columns
-input_col1, input_col2 = st.columns([4, 1])
+input_col1 = st.container()
 
 with input_col1:
     movie_input = st.text_input("Enter a Movie Title:", key="movie_input")
 
-with input_col2:
-    recommend_clicked = st.button("Recommend")
-
+recommend_clicked = st.button("Recommend")
 clear_clicked = st.button("Clear Selection")
 
 if clear_clicked:
     st.experimental_rerun()
 
-if movie_input and (recommend_clicked or movie_input):
+if recommend_clicked and movie_input:
     movie_input = movie_input.strip().lower()
 
     matches = movies[movies['normalized_title'] == movie_input]
@@ -102,7 +100,7 @@ if movie_input and (recommend_clicked or movie_input):
                 rec_cols[0].write("[Image not available]")
 
             # Movie info
-            rec_cols[1].markdown(f"**{movie['title']}")
+            rec_cols[1].markdown(f"**{movie['title']} ")
             rec_cols[1].markdown(f"⭐ Rating: {movie.get('vote_average', 'N/A')}")
             overview = movie.get('overview', 'Overview not available.')
             rec_cols[1].markdown(f"📝 {overview}")
