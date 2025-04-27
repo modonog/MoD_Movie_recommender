@@ -18,6 +18,7 @@ if 'release_year' not in movies.columns and 'release_date' in movies.columns:
 # Normalize title for fuzzy matching
 movies['normalized_title'] = movies['title'].str.lower()
 
+# Helper function
 def get_recommendations(movie_idx, top_n=5):
     similar = top_similar_movies.get(movie_idx, [])
     recommendations = []
@@ -41,13 +42,12 @@ def fetch_poster(poster_path):
 st.set_page_config(page_title="Movie Recommender", layout="wide")
 st.title("🎬 MoD's CS8740 Movie Recommender")
 
-# Initialize session state for clearing input
-if "clear" not in st.session_state:
-    st.session_state.clear = False
+# Initialize session state for fuzzy match
+if "selected_title" not in st.session_state:
+    st.session_state.selected_title = None
 
-# Add input area with columns
+# Input area
 input_col1 = st.container()
-
 with input_col1:
     movie_input = st.text_input("Enter a Movie Title:", key="movie_input")
 
@@ -56,24 +56,32 @@ clear_clicked = st.button("Clear Selection")
 
 if clear_clicked:
     st.session_state.movie_input = ""
-    st.session_state.clear = False
+    st.session_state.selected_title = None
     st.experimental_rerun()
 
-if recommend_clicked and movie_input:
-    movie_input = movie_input.strip().lower()
+if recommend_clicked:
+    if st.session_state.selected_title:
+        # If user already selected from fuzzy list
+        selected_movie_row = movies[movies['title'] == st.session_state.selected_title]
+        matches = selected_movie_row
+        st.session_state.selected_title = None  # Reset after use
+    else:
+        # Normal search
+        movie_input_clean = movie_input.strip().lower()
+        matches = movies[movies['normalized_title'] == movie_input_clean]
 
-    matches = movies[movies['normalized_title'] == movie_input]
+        if matches.empty:
+            matches = movies[movies['normalized_title'].str.contains(movie_input_clean, na=False)]
 
-    if matches.empty:
-        matches = movies[movies['normalized_title'].str.contains(movie_input, na=False)]
-
-    if matches.empty:
-        title_list = movies['normalized_title'].tolist()
-        close_matches = get_close_matches(movie_input, title_list, n=5, cutoff=0.6)
-        if close_matches:
-            matched_movies = movies[movies['normalized_title'].isin(close_matches)]
-            selected_title = st.selectbox("Select the closest match:", matched_movies['title'])
-            matches = movies[movies['title'] == selected_title]
+        if matches.empty:
+            title_list = movies['normalized_title'].tolist()
+            close_matches = get_close_matches(movie_input_clean, title_list, n=5, cutoff=0.6)
+            if close_matches:
+                matched_movies = movies[movies['normalized_title'].isin(close_matches)]
+                selected_title = st.selectbox("Select the closest match:", matched_movies['title'])
+                if selected_title:
+                    st.session_state.selected_title = selected_title
+                st.stop()
 
     if matches.empty:
         st.warning("❌ Movie not found in dataset.")
