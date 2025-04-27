@@ -41,9 +41,21 @@ def fetch_poster(poster_path):
 st.set_page_config(page_title="Movie Recommender", layout="wide")
 st.title("🎬 MoD's CS8740 Movie Recommender")
 
-movie_input = st.text_input("Enter a Movie Title:")
+# Add input area with columns
+input_col1, input_col2 = st.columns([4, 1])
 
-if movie_input:
+with input_col1:
+    movie_input = st.text_input("Enter a Movie Title:", key="movie_input")
+
+with input_col2:
+    recommend_clicked = st.button("Recommend")
+
+clear_clicked = st.button("Clear Selection")
+
+if clear_clicked:
+    st.experimental_rerun()
+
+if movie_input and (recommend_clicked or movie_input):
     movie_input = movie_input.strip().lower()
 
     matches = movies[movies['normalized_title'] == movie_input]
@@ -64,7 +76,7 @@ if movie_input:
     else:
         selected_movie = matches.iloc[0]
 
-        st.subheader(f"Selected Movie: {selected_movie['title']} ({int(selected_movie['release_year']) if pd.notna(selected_movie['release_year']) else 'N/A'})")
+        st.subheader(f"Selected Movie: {selected_movie['title']}")
         cols = st.columns([1, 4])
 
         poster_image = fetch_poster(selected_movie['poster_path'])
@@ -90,7 +102,7 @@ if movie_input:
                 rec_cols[0].write("[Image not available]")
 
             # Movie info
-            rec_cols[1].markdown(f"**{movie['title']} ({int(movie['release_year']) if pd.notna(movie['release_year']) else 'N/A'})**")
+            rec_cols[1].markdown(f"**{movie['title']}")
             rec_cols[1].markdown(f"⭐ Rating: {movie.get('vote_average', 'N/A')}")
             overview = movie.get('overview', 'Overview not available.')
             rec_cols[1].markdown(f"📝 {overview}")
