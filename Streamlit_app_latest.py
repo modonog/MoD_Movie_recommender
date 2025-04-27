@@ -55,12 +55,9 @@ recommend_clicked = st.button("Recommend")
 clear_clicked = st.button("Clear Selection")
 
 if clear_clicked:
-    st.session_state.clear = True
-    st.experimental_rerun()
-
-if st.session_state.clear:
     st.session_state.movie_input = ""
     st.session_state.clear = False
+    st.experimental_rerun()
 
 if recommend_clicked and movie_input:
     movie_input = movie_input.strip().lower()
