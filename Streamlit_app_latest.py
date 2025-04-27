@@ -65,7 +65,7 @@ if movie_input:
     else:
         selected_movie = matches.iloc[0]
 
-        st.subheader(f"Selected Movie: {selected_movie['title']} ({int(selected_movie['release_year']) if pd.notna(selected_movie['release_year']) else 'N/A'})")
+        st.subheader(f"Selected Movie: {selected_movie['title']}")
         cols = st.columns([1, 4])
 
         poster_image = fetch_poster(selected_movie['poster_path'])
@@ -91,7 +91,7 @@ if movie_input:
                 rec_cols[0].write("[Image not available]")
 
             # Movie info
-            rec_cols[1].markdown(f"**{movie['title']} ({int(movie['release_year']) if pd.notna(movie['release_year']) else 'N/A'})**")
+            rec_cols[1].markdown(f"**{movie['title']}")
             rec_cols[1].markdown(f"⭐ Rating: {movie.get('vote_average', 'N/A')}")
             overview = movie.get('overview', 'Overview not available.')
             rec_cols[1].markdown(f"📝 {overview}")
