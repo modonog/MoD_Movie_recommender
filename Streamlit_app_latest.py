@@ -1,3 +1,4 @@
+
 import streamlit as st
 import pandas as pd
 import pickle
@@ -18,7 +19,6 @@ if 'release_year' not in movies.columns and 'release_date' in movies.columns:
 # Normalize title for fuzzy matching
 movies['normalized_title'] = movies['title'].str.lower()
 
-# Helper function
 def get_recommendations(movie_idx, top_n=5):
     similar = top_similar_movies.get(movie_idx, [])
     recommendations = []
@@ -42,53 +42,30 @@ def fetch_poster(poster_path):
 st.set_page_config(page_title="Movie Recommender", layout="wide")
 st.title("🎬 MoD's CS8740 Movie Recommender")
 
-# Initialize session state for fuzzy match
-if "selected_title" not in st.session_state:
-    st.session_state.selected_title = None
+movie_input = st.text_input("Enter a Movie Title:")
 
-# Input area
-input_col1 = st.container()
-with input_col1:
-    movie_input = st.text_input("Enter a Movie Title:", key="movie_input")
+if movie_input:
+    movie_input = movie_input.strip().lower()
 
-recommend_clicked = st.button("Recommend")
-clear_clicked = st.button("Clear Selection")
+    matches = movies[movies['normalized_title'] == movie_input]
 
-if clear_clicked:
-    st.session_state.movie_input = ""
-    st.session_state.selected_title = None
-    st.experimental_rerun()
+    if matches.empty:
+        matches = movies[movies['normalized_title'].str.contains(movie_input, na=False)]
 
-if recommend_clicked:
-    if st.session_state.selected_title:
-        # If user already selected from fuzzy list
-        selected_movie_row = movies[movies['title'] == st.session_state.selected_title]
-        matches = selected_movie_row
-        st.session_state.selected_title = None  # Reset after use
-    else:
-        # Normal search
-        movie_input_clean = movie_input.strip().lower()
-        matches = movies[movies['normalized_title'] == movie_input_clean]
-
-        if matches.empty:
-            matches = movies[movies['normalized_title'].str.contains(movie_input_clean, na=False)]
-
-        if matches.empty:
-            title_list = movies['normalized_title'].tolist()
-            close_matches = get_close_matches(movie_input_clean, title_list, n=5, cutoff=0.6)
-            if close_matches:
-                matched_movies = movies[movies['normalized_title'].isin(close_matches)]
-                selected_title = st.selectbox("Select the closest match:", matched_movies['title'])
-                if selected_title:
-                    st.session_state.selected_title = selected_title
-                st.stop()
+    if matches.empty:
+        title_list = movies['normalized_title'].tolist()
+        close_matches = get_close_matches(movie_input, title_list, n=5, cutoff=0.6)
+        if close_matches:
+            matched_movies = movies[movies['normalized_title'].isin(close_matches)]
+            selected_title = st.selectbox("Select the closest match:", matched_movies['title'])
+            matches = movies[movies['title'] == selected_title]
 
     if matches.empty:
         st.warning("❌ Movie not found in dataset.")
     else:
         selected_movie = matches.iloc[0]
 
-        st.subheader(f"Selected Movie: {selected_movie['title']}")
+        st.subheader(f"Selected Movie: {selected_movie['title']} ({int(selected_movie['release_year']) if pd.notna(selected_movie['release_year']) else 'N/A'})")
         cols = st.columns([1, 4])
 
         poster_image = fetch_poster(selected_movie['poster_path'])
@@ -114,7 +91,7 @@ if recommend_clicked:
                 rec_cols[0].write("[Image not available]")
 
             # Movie info
-            rec_cols[1].markdown(f"**{movie['title']}")
+            rec_cols[1].markdown(f"**{movie['title']} ({int(movie['release_year']) if pd.notna(movie['release_year']) else 'N/A'})**")
             rec_cols[1].markdown(f"⭐ Rating: {movie.get('vote_average', 'N/A')}")
             overview = movie.get('overview', 'Overview not available.')
             rec_cols[1].markdown(f"📝 {overview}")
